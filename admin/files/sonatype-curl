@@ -1,1 +1,1 @@
-user = ${SONA_USER}:${SONA_PASS}
+user = ${SONA_USER_DUMMY}:${SONA_PASS_DUMMY}
