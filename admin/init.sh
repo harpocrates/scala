@@ -10,7 +10,7 @@ sensitive() {
   perl -p -e 's/\$\{([^}]+)\}/defined $ENV{$1} ? $ENV{$1} : $&/eg' < files/credentials-sonatype     > ~/.credentials-sonatype
   perl -p -e 's/\$\{([^}]+)\}/defined $ENV{$1} ? $ENV{$1} : $&/eg' < files/sonatype-curl            > ~/.sonatype-curl
 
-  openssl aes-256-cbc -md md5 -pass "pass:$GPG_SUBKEY_SECRET_DUMMY" -in files/gpg_subkey.enc | gpg --import
+  openssl aes-256-cbc -md md5 -d -pass "pass:$GPG_SUBKEY_SECRET_DUMMY" -in files/gpg_subkey.enc | gpg --import
 }
 
 GPG_SUBKEY_SECRET_DUMMY="nix"
