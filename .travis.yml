@@ -1,8 +1,6 @@
 version: ~> 1.0 # needed for imports
 import: scala/scala-dev:travis/default.yml
 
-dist: bionic  # for generating spec PDF; see #7432
-
 language: scala
 
 stages:
