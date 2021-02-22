@@ -3,6 +3,11 @@ import: scala/scala-dev:travis/default.yml
 
 dist: bionic  # for generating spec PDF; see #7432
 
+# bionic has GPG 2, but admin/init.sh wants GPG 1
+before_install:
+- sudo apt-get install -y gnupg1
+- sudo ln -s /usr/bin/gpg1 /usr/local/bin/gpg
+
 language: scala
 
 stages:
