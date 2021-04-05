@@ -130,7 +130,11 @@ abstract class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
   }
 
   def bootstrapMethodArg(t: Constant, pos: Position): AnyRef = t match {
-    case Constant(mt: Type) => methodBTypeFromMethodType(transformedType(mt), isConstructor = false).toASMType
+    case Constant(t: Type) =>
+      transformedType(t) match {
+        case mt: MethodType => methodBTypeFromMethodType(mt, isConstructor = false).toASMType
+        case t: Type => typeToBType(t).toASMType
+      }
     case c @ Constant(sym: Symbol) if sym.owner.isJavaDefined && sym.isStaticMember => staticHandleFromSymbol(sym)
     case c @ Constant(sym: Symbol) => handleFromMethodSymbol(sym)
     case c @ Constant(value: String) => value
@@ -152,7 +156,10 @@ abstract class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
 
   def handleFromMethodSymbol(sym: Symbol): asm.Handle = {
     val isConstructor = (sym.isClassConstructor)
-    val descriptor = methodBTypeFromMethodType(sym.info, isConstructor).descriptor
+    val isField = sym.isField
+    val descriptor =
+      if (isField) typeToBType(sym.info).descriptor
+      else methodBTypeFromMethodType(sym.info, isConstructor).descriptor
     val ownerBType = classBTypeFromSymbol(sym.owner)
     val rawInternalName = ownerBType.internalName
     val ownerInternalName = rawInternalName
@@ -163,8 +170,12 @@ abstract class BTypesFromSymbols[G <: Global](val global: G) extends BTypes {
                 else asm.Opcodes.H_INVOKESTATIC
               } else if (isConstructor) asm.Opcodes.H_NEWINVOKESPECIAL
               else if (isInterface) asm.Opcodes.H_INVOKEINTERFACE
+              else if (isField) asm.Opcodes.H_GETFIELD
               else asm.Opcodes.H_INVOKEVIRTUAL
-    new asm.Handle(tag, ownerInternalName, if (isConstructor) sym.name.toString else sym.name.encoded, descriptor, isInterface)
+    val name = if (isConstructor) sym.name.toString
+               else if (isField) sym.name.toString.init
+               else sym.name.encoded
+    new asm.Handle(tag, ownerInternalName, name, descriptor, isInterface)
   }
 
   /**
