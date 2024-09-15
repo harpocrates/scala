@@ -7,6 +7,7 @@ import scala.math.Ordering
 
 import mutable.{ArrayBuffer, Builder}
 
+@annotation.nowarn("cat=deprecation&origin=scala.collection.mutable.AnyRefMap")
 class BuildFromTest {
 
   // You can either overload methods for IterableOps and Iterable with SortedOps (if you want to support constrained collection types)
