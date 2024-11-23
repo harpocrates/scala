@@ -1217,6 +1217,11 @@ trait ContextErrors extends splain.SplainErrors {
           case (tpe, _) => tpe
         }
 
+      def NoMatchingAlternative(tree: Tree, alts: List[Symbol], argTpes: List[Type], pt: Type) = {
+        val msg = " does not match arguments "
+        issueNormalTypeError(tree, applyErrorMsg(tree, msg, argTpes, pt))
+      }
+
       def NoBestMethodAlternativeError(tree: Tree, argtpes: List[Type], pt: Type, lastTry: Boolean) = {
         val alts = alternatives(tree)
         val widenedArgtpes = widenArgs(argtpes, alts.head.params, alts.tail.head.params)

@@ -15,8 +15,7 @@ package tools.nsc
 package typechecker
 
 import scala.annotation._
-import scala.collection.mutable
-import mutable.ListBuffer
+import scala.collection.mutable, mutable.{ArrayBuffer, ListBuffer}
 import scala.reflect.internal.{Chars, TypesStats}
 import scala.reflect.internal.util.{CodeAction, FreshNameCreator, ListOfNil, Statistics}
 import scala.tools.nsc.Reporting.{MessageFilter, Suppression, WConf, WarningCategory}, WarningCategory.Scala3Migration
@@ -409,7 +408,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
       private val maxRecursion = 42
 
       // For each abstract type symbol (type member, type parameter), keep track of seen types represented by that symbol
-      private lazy val map = collection.mutable.HashMap[Symbol, mutable.ListBuffer[Type]]()
+      private lazy val map = mutable.HashMap[Symbol, ListBuffer[Type]]()
 
       def lockSymbol[T](sym: Symbol, tp: Type)(body: => T): T = {
         val stk = map.getOrElseUpdate(sym, ListBuffer.empty)
@@ -3145,7 +3144,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
         // After typer, no need for further checks, parameter type inference or PartialFunction synthesis.
         if (isPastTyper) doTypedFunction(fun, resProto)
         else {
-          val paramsMissingType = mutable.ArrayBuffer.empty[ValDef] //.sizeHint(numVparams) probably useless, since initial size is 16 and max fun arity is 22
+          val paramsMissingType = ArrayBuffer.empty[ValDef] //.sizeHint(numVparams) probably useless, since initial size is 16 and max fun arity is 22
 
           // first, try to define param types from expected function's arg types if needed
           foreach2(vparams, argProtos) { (vparam, argpt) =>
@@ -3166,12 +3165,22 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
               // we ran out of things to try, missing parameter types are an irrevocable error
               var issuedMissingParameterTypeError = false
               paramsMissingType.foreach { vparam =>
-                setError(vparam) //  see neg/t8675b.scala (we used to set vparam.tpt to ErrorType, but that isn't as effective)
+                setError(vparam) // see neg/t8675b.scala setting vparam.tpt to ErrorType isn't as effective
                 MissingParameterTypeError(fun, vparam, pt, withTupleAddendum = !issuedMissingParameterTypeError)
                 issuedMissingParameterTypeError = true
               }
-
-              setError(fun)
+              fun match {
+                case Function(_, Match(_, _)) => setError(fun)
+                case _ if !issuedMissingParameterTypeError => setError(fun)
+                case _ =>
+                  // Improve error reporting: propagate what we know about the function's type for better failure.
+                  val paramTypesForErrorMessage = vparams.map { param =>
+                    if (param.tpt.isEmpty) WildcardType
+                    else silent(_.typedType(param.tpt).tpe)
+                        .fold(WildcardType: Type) { case ErrorType => NoType case tp => tp }
+                  }
+                  fun.setType(appliedType(FunctionClass(numVparams), paramTypesForErrorMessage :+ WildcardType))
+              }
             }
           } else if (numVparams == 1 && pt.typeSymbol == PartialFunctionClass) { // dodge auto-tupling with the == 1
             // translate `x => x match { <cases> }` : PartialFunction to
@@ -3607,7 +3616,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
               // No need for phasedAppliedType, as we don't get here during erasure --
               // overloading resolution happens during type checking.
               // During erasure, the condition above (fun.symbol.isOverloaded) is false.
-              functionType(vparams map (_ => AnyTpe), shapeType(body))
+              functionType(vparams.map(_ => AnyTpe), shapeType(body))
             case Match(EmptyTree, _) => // A partial function literal
               appliedType(PartialFunctionClass, AnyTpe :: NothingTpe :: Nil)
             case NamedArg(Ident(name), rhs) =>
@@ -3615,7 +3624,7 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
             case _ =>
               NothingTpe
           }
-          val argtypes = args map shapeType
+          val argtypes = args.map(shapeType)
           val pre = fun.symbol.tpe.prefix
           var sym = fun.symbol filter { alt =>
             // must use pt as expected type, not WildcardType (a tempting quick fix to #2665)
@@ -3642,12 +3651,14 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
               case sym1        => sym = sym1
             }
           }
-          if (sym == NoSymbol) fun
+          if (sym == NoSymbol) EmptyTree
           else adaptAfterOverloadResolution(fun setSymbol sym setType pre.memberType(sym), mode.forFunMode)
         } else fun
       }
 
-      val fun = preSelectOverloaded(fun0)
+      val preSelected = preSelectOverloaded(fun0)
+      val shapeless = preSelected.isEmpty
+      val fun = if (shapeless) fun0 else preSelected
       val argslen = args.length
 
       fun.tpe match {
@@ -3665,10 +3676,6 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
                 }
 
                 arg match {
-                  // scala/bug#8197/scala/bug#4592 call for checking whether this named argument could be interpreted as an assign
-                  // infer.checkNames must not use UnitType: it may not be a valid assignment, or the setter may return another type from Unit
-                  // TODO: just make it an error to refer to a non-existent named arg, as it's far more likely to be
-                  //       a typo than an assignment passed as an argument
                   case NamedArg(lhs@Ident(name), rhs) =>
                     // named args: only type the righthand sides ("unknown identifier" errors otherwise)
                     // the assign is untyped; that's ok because we call doTypedApply
@@ -3686,8 +3693,22 @@ trait Typers extends Adaptations with Tags with TypersTracking with PatternTyper
                 }
               }
             }
-            if (context.reporter.hasErrors)
+            if (context.reporter.hasErrors) {
+              if (shapeless) {
+                val argsWilded = args1.zip(argTpes).map {
+                  case (Function(vparams, _), argTpe) if argTpe.isError =>
+                    val paramTypesForErrorMessage = vparams.map { param =>
+                      if (param.tpt.isEmpty) WildcardType
+                      else silent(_.typedType(param.tpt).tpe)
+                          .fold(WildcardType: Type) { case ErrorType => NoType case tp => tp }
+                    }
+                    appliedType(FunctionClass(vparams.length), paramTypesForErrorMessage :+ WildcardType)
+                  case (_, argTpe) => if (argTpe.isError) WildcardType else argTpe
+                }
+                InferErrorGen.NoMatchingAlternative(fun, alts, argsWilded, pt)
+              }
               setError(tree)
+            }
             else {
               // warn about conversions applied to blocks (#9386) in lieu of fixing
               def checkConversionsToBlockArgs(appl: Tree): Unit =
