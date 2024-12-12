@@ -15,7 +15,7 @@ To contribute here, please open a [pull request](https://help.github.com/article
 
 Be aware that we can't accept additions to the standard library, only modifications to existing code.  Binary compatibility forbids adding new public classes or public methods. Additions are made to [scala-library-next](https://github.com/scala/scala-library-next) instead.
 
-We require that you sign the [Scala CLA](https://www.lightbend.com/contribute/cla/scala) before we can merge any of your work, to protect Scala's future as open source software.
+We require that you sign the [Scala CLA](https://contribute.akka.io/contribute/cla/scala) before we can merge any of your work, to protect Scala's future as open source software.
 
 The general workflow is as follows.
 1. Find/file an issue in scala/bug (or submit a well-documented PR right away!).
