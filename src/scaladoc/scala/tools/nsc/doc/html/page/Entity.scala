@@ -1,7 +1,7 @@
 /*
  * Scala (https://www.scala-lang.org)
  *
- * Copyright EPFL and Lightbend, Inc.
+ * Copyright EPFL and Lightbend, Inc. dba Akka
  *
  * Licensed under Apache License 2.0
  * (http://www.apache.org/licenses/LICENSE-2.0).
@@ -407,7 +407,7 @@ trait EntityPage extends HtmlPage {
 
       {
         if (Set("epfl", "EPFL").contains(tpl.universe.settings.docfooter.value))
-          <div id="footer">Scala programming documentation. Copyright (c) 2002-2024 <a href="http://www.epfl.ch" target="_top">EPFL</a>, with contributions from <a href="http://www.lightbend.com" target="_top">Lightbend</a>.</div>
+          <div id="footer">Scala programming documentation. Copyright (c) 2002-2024 <a href="http://www.epfl.ch" target="_top">EPFL</a>, with contributions from <a href="https://akka.io" target="_top">Akka</a>.</div>
         else
           <div id="footer"> { tpl.universe.settings.docfooter.value } </div>
       }
