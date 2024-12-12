@@ -16,7 +16,7 @@ By the way, the team at Lightbend is: @lrytz, @retronym, @SethTisue, and @dwijna
 
 ## What kind of PR are you submitting?
 
-Regardless of the nature of your Pull Request, we have to ask you to digitally sign the [Scala CLA](https://www.lightbend.com/contribute/cla/scala), to protect the OSS nature of the code base.
+Regardless of the nature of your Pull Request, we have to ask you to digitally sign the [Scala CLA](https://contribute.akka.io/contribute/cla/scala), to protect the OSS nature of the code base.
 
 You don't need to submit separate PRs for 2.12.x and 2.13.x. Any change accepted on 2.12.x will, in time, be merged onto 2.13.x too. (We are no longer accepting PRs for 2.11.x.)
 
