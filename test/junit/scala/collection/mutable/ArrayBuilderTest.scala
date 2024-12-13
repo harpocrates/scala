@@ -39,4 +39,11 @@ class ArrayBuilderTest {
     (1 to 100).foreach(_ => builder.addAll(Array.empty[String]))
     assertEquals(0, builder.knownSize)
   }
+
+  @Test def `t13068 addAll of array`: Unit = {
+    val ab: ArrayBuilder[Unit] = ArrayBuilder.make[Unit]
+    val arr = Array[Unit]((), (), (), (), (), (), (), (), (), (), (), ())
+    ab.addAll(arr)
+    assertEquals(arr.length, ab.result().length)
+  }
 }
