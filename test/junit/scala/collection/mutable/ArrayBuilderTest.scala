@@ -1,8 +1,9 @@
 package scala.collection.mutable
 
-import org.junit.Assert.assertEquals
+import org.junit.Assert.{assertEquals, assertTrue}
 import org.junit.Test
 
+import scala.annotation._
 import scala.runtime.PStatics.VM_MaxArraySize
 import scala.tools.testkit.AssertUtil.assertThrows
 
@@ -45,5 +46,6 @@ class ArrayBuilderTest {
     val arr = Array[Unit]((), (), (), (), (), (), (), (), (), (), (), ())
     ab.addAll(arr)
     assertEquals(arr.length, ab.result().length)
+    assertTrue(ab.result().forall(_ == ())): @nowarn
   }
 }
