@@ -110,11 +110,9 @@ trait TypeDiagnostics extends splain.SplainDiagnostics {
     else ""
 
   private def methodTypeErrorString(tp: Type) = tp match {
-    case MethodType(params, resultType)  =>
-      def forString = params.map(_.defString)
-
-       forString.mkString("(", ",", ")") + resultType
-    case x                                    => x.toString
+    case MethodType(params, resultType) =>
+      params.map(_.defString).mkString("(", ",", s")$resultType")
+    case tp => tp.toString
   }
 
   /**
