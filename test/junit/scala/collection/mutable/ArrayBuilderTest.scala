@@ -30,7 +30,7 @@ class ArrayBuilderTest {
     assertThrows[Exception](ab.addAll(arr.iterator), _.endsWith("Requested length: -2147483645; current length: 2147483639; increase: 12"))
 
     // expect an exception when trying to grow larger than maximum size by addAll(array)
-    assertThrows[Exception](ab.addAll(arr))
+    assertThrows[Exception](ab.addAll(arr), _.startsWith("Overflow while resizing"))
   }
 
   // avoid allocating "default size" for empty, and especially avoid doubling capacity for empty
