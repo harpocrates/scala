@@ -14,7 +14,7 @@
   </component>
   <component name="CopyrightManager" default="Scala">
     <copyright>
-      <option name="notice" value="Scala (https://www.scala-lang.org)&#10;&#10;Copyright EPFL and Lightbend, Inc.&#10;&#10;Licensed under Apache License 2.0&#10;(http://www.apache.org/licenses/LICENSE-2.0).&#10;&#10;See the NOTICE file distributed with this work for&#10;additional information regarding copyright ownership." />
+      <option name="notice" value="Scala (https://www.scala-lang.org)&#10;&#10;Copyright EPFL and Lightbend, Inc. dba Akka&#10;&#10;Licensed under Apache License 2.0&#10;(http://www.apache.org/licenses/LICENSE-2.0).&#10;&#10;See the NOTICE file distributed with this work for&#10;additional information regarding copyright ownership." />
       <option name="myName" value="Scala" />
     </copyright>
   </component>

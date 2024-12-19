@@ -4,19 +4,9 @@ We follow the standard GitHub [fork & pull](https://help.github.com/articles/usi
 
 You're always welcome to submit your PR straight away and start the discussion (without reading the rest of this wonderful doc, or the [`README.md`](README.md)). The goal of these notes is to make your experience contributing to Scala as smooth and pleasant as possible. We're happy to guide you through the process once you've submitted your PR.
 
-## The Scala Community
-
-In 2014, you -- the Scala community -- matched the core team at EPFL in number of commits contributed to Scala 2.11, doubling the percentage of commits from outside EPFL/Lightbend since 2.10. Excellent work! (The split was roughly 25/25/50 for you/EPFL/Lightbend.)
-
-We are super happy about this, and are eager to make your experience contributing to Scala productive and satisfying, so that we can keep up this growth. We can't do this alone (nor do we want to)!
-
-This is why we're collecting these notes on how to contribute, and we hope you'll share your experience to improve the process for the next contributor! (Feel free to send a PR for this note, send your thoughts to \#scala-contributors (on [Discord](https://discord.com/invite/scala)) or contributors.scala-lang.org (Discourse).)
-
-By the way, the team at Lightbend is: @lrytz, @retronym, @SethTisue, and @dwijnand.
-
 ## What kind of PR are you submitting?
 
-Regardless of the nature of your Pull Request, we have to ask you to digitally sign the [Scala CLA](https://contribute.akka.io/contribute/cla/scala), to protect the OSS nature of the code base.
+Regardless of the nature of your Pull Request, we have to ask you to digitally sign the [Scala CLA](https://contribute.akka.io/cla/scala), to protect the OSS nature of the code base.
 
 You don't need to submit separate PRs for 2.12.x and 2.13.x. Any change accepted on 2.12.x will, in time, be merged onto 2.13.x too. (We are no longer accepting PRs for 2.11.x.)
 
