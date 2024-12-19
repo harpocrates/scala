@@ -104,7 +104,7 @@ globalVersionSettings
 (ThisBuild / headerLicense)  := Some(HeaderLicense.Custom(
   s"""Scala (${(ThisBuild / homepage).value.get})
      |
-     |Copyright EPFL and Lightbend, Inc.
+     |Copyright EPFL and Lightbend, Inc. dba Akka
      |
      |Licensed under Apache License 2.0
      |(http://www.apache.org/licenses/LICENSE-2.0).
@@ -236,8 +236,8 @@ lazy val commonSettings = instanceSettings ++ clearSourceAndResourceDirectories 
           <name>LAMP/EPFL</name>
         </developer>
         <developer>
-          <id>Lightbend</id>
-          <name>Lightbend, Inc.</name>
+          <id>Akka</id>
+          <name>Lightbend, Inc. dba Akka</name>
         </developer>
       </developers>
   },
@@ -623,7 +623,7 @@ lazy val scalap = configureAsSubproject(project)
     headerLicense  := Some(HeaderLicense.Custom(
       s"""Scala classfile decoder (${(ThisBuild / homepage).value.get})
          |
-         |Copyright EPFL and Lightbend, Inc.
+         |Copyright EPFL and Lightbend, Inc. dba Akka
          |
          |Licensed under Apache License 2.0
          |(http://www.apache.org/licenses/LICENSE-2.0).
