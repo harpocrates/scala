@@ -83,9 +83,15 @@ sealed class ZincCompiler(settings: Settings, dreporter: DelegatingReporter, out
     extends CallbackGlobal(settings, dreporter, output)
     with ZincGlobalCompat {
 
+  // AnalysisCallback3 is a class introduced in recent version of Zinc
+  // Hence when we run Scala Compiler against an old version of Zinc
+  // AnalysisCallback3 is not in classpath
+  // Hence asInstanceOf[AnalysisCallback3] throws a NoClassDefFoundError
+  private lazy val callback3Opt = scala.util.Try(callback.asInstanceOf[AnalysisCallback3]).toOption
+
   override def getSourceFile(f: AbstractFile): BatchSourceFile = {
-    val file = (f, callback) match {
-      case (plainFile: PlainFile, callback3: AnalysisCallback3) =>
+    val file = (f, callback3Opt) match {
+      case (plainFile: PlainFile, Some(callback3)) =>
         AbstractZincFile(callback3.toVirtualFile(plainFile.file.toPath))
       case _ => f
     }
